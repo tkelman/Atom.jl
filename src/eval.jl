@@ -90,8 +90,10 @@ handle("eval-repl") do data
     elseif mode == "help"
       data["code"] = "@doc $(data["code"])"
     end
+
+    mod = getthing(data["module"], Main)
     try
-      render(@errs include_string(data["code"]))
+      render(@errs include_string(mod, data["code"]))
     catch e
       showerror(STDERR, e, catch_backtrace())
     end
