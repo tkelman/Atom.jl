@@ -120,11 +120,13 @@ handle("eval-repl") do data
 end
 
 handle("docs") do data
-  result = @errs include_string("@doc $(data["code"])")
+  mod = include_string(data["module"])
+  result = @errs include_string(mod, "@doc $(data["code"])")
   @d(:result => render(Editor(), result))
 end
 
 handle("methods") do data
+  mod = include_string(data["module"])
   word = data["code"]
   wordtype = try
     include_string("typeof($word)")
@@ -132,9 +134,10 @@ handle("methods") do data
     Function
   end
   if wordtype == Function
-    result = @errs include_string("methods($word)")
+    result = @errs include_string(mod, "methods($word)")
   elseif wordtype == DataType
-    result = @errs include_string("methodswith($word)")
+    result = @errs include_string(mod, "methodswith($word)")
   end
-  @d(:result => method_obj(result))
+  @d(:result  => method_obj(result), 
+     :error   => typeof(result)==EvalError ? true : false)
 end
